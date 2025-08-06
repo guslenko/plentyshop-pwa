@@ -21,7 +21,7 @@ export const appConfiguration = {
   head: {
     viewport: 'minimum-scale=1, initial-scale=1, width=device-width',
     htmlAttrs: {
-      lang: process.env.DEFAULTLANGUAGE ?? 'en',
+      lang: process.env.DEFAULTLANGUAGE ?? 'de',
     },
     meta: [
       { name: 'description', content: metaDefaults.description },
