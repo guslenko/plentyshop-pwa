@@ -1,0 +1,49 @@
+name: Deploy PWA
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to deploy'
+        required: true
+        default: 'main'
+      environment:
+        description: 'Environment (staging or production)'
+        required: true
+        default: 'production'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to Plenty
+        env:
+          API_URL: ${{ vars.API_URL }}
+          CONFIG_ID: ${{ vars.CONFIG_ID }}
+          CONFIG: ${{ vars.CONFIG }}
+          API_SECURITY_TOKEN: ${{ secrets.API_SECURITY_TOKEN }}
+          URL_ENDPOINT_TOKEN: ${{ secrets.URL_ENDPOINT_TOKEN }}
+          URL_ENDPOINT_TOKEN_STAGING: ${{ secrets.URL_ENDPOINT_TOKEN_STAGING }}
+        run: |
+          npm run deploy:${{ github.event.inputs.environment || 'production' }}
